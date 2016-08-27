@@ -13,10 +13,12 @@ public class PlayerController : MonoBehaviour
     public Transform enemy;
     public float distanceOnSprinting = 4;
     public float liveDistance = 2;
+    public float maxJumpingTime;
 
     private Rigidbody2D rb2d;
     private float startSprintingPosition = 0;
     private Animator animator;
+    private float jumpingTime = 0;
     private states status
     {
         get
@@ -58,12 +60,18 @@ public class PlayerController : MonoBehaviour
         if (GameManager.lifes > 0)
         {
             float speed = GameManager.currentSpeed;
-            if ((Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-                && status != states.jumping && status != states.resting)
+            if ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+                && status != states.resting)
             {
-                rb2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
-                status = states.jumping;
-                animator.SetBool("isJumping", true);
+                jumpingTime += Time.deltaTime;
+                if (jumpingTime <= maxJumpingTime) {
+                    rb2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Force);
+                    status = states.jumping;
+                    animator.SetBool("isJumping", true);
+                }
+            }
+            if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W)) {
+                jumpingTime = 0;
             }
             if (status == states.sprinting)
             {

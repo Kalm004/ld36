@@ -48,16 +48,12 @@ public class MainGameController : MonoBehaviour
 
     private void generateObstacle()
     {
-        int prefabType = Random.Range(0, obstaclePrefabs.Length);
-        GameObject obstacle = Instantiate(obstaclePrefabs[prefabType]);
-        obstacle.transform.position = new Vector3(player.position.x + 20, obstacle.transform.position.y, 0);
-        if (obstacle.tag == "Platform")
+        if (lastGeneratedPlatformX < player.position.x + 10)
         {
-            if (lastGeneratedPlatformX > obstacle.transform.position.x)
-            {
-                Destroy(obstacle);
-            }
-            else
+            int prefabType = Random.Range(0, obstaclePrefabs.Length);
+            GameObject obstacle = Instantiate(obstaclePrefabs[prefabType]);
+            obstacle.transform.position = new Vector3(player.position.x + 20, obstacle.transform.position.y, 0);
+            if (obstacle.tag == "Platform")
             {
                 int morePlatforms = Random.Range(0, 5);
                 for (int i = 0; i < morePlatforms; i++)
