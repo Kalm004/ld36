@@ -36,9 +36,9 @@ public class EnemyController : MonoBehaviour
         {
             GameManager.score += 10;
         }
-        if (collision.tag == "Platform")
-        {
-            Destroy(collision.gameObject);
-        }
+        //if (collision.tag == "Platform")
+        //{
+        //    Destroy(collision.gameObject);
+        //}
     }
 }
