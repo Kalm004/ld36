@@ -41,7 +41,8 @@ public class PlayerController : MonoBehaviour
         running = 0,
         jumping = 1,
         resting = 2,
-        sprinting = 3
+        sprinting = 3,
+        falling = 4
     }
 
     // Use this for initialization
@@ -61,17 +62,22 @@ public class PlayerController : MonoBehaviour
         {
             float speed = GameManager.currentSpeed;
             if ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
-                && status != states.resting)
+                && status != states.jumping && status != states.falling && status != states.resting)
+            {
+                status = states.jumping;
+                animator.SetBool("isJumping", true);
+            }
+            if ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
+                && status == states.jumping)
             {
                 jumpingTime += Time.deltaTime;
                 if (jumpingTime <= maxJumpingTime) {
                     rb2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Force);
-                    status = states.jumping;
-                    animator.SetBool("isJumping", true);
                 }
             }
             if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W)) {
                 jumpingTime = 0;
+                status = states.falling;
             }
             if (status == states.sprinting)
             {
@@ -101,7 +107,7 @@ public class PlayerController : MonoBehaviour
             transform.Translate(speed * Time.deltaTime, 0, 0);
         }
 
-        if ((Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) && status != states.sprinting && status != states.jumping)
+        if ((Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) && status != states.sprinting && status != states.jumping && status != states.falling)
         {
             status = states.sprinting;
             startSprintingPosition = transform.position.x;
@@ -118,7 +124,7 @@ public class PlayerController : MonoBehaviour
         }
         if (collision.collider.tag == "Floor")
         {
-            if (status == states.jumping)
+            if (status == states.falling)
             {
                 animator.SetBool("isJumping", false);
                 status = states.resting;
