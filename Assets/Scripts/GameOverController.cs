@@ -10,11 +10,15 @@ public class GameOverController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	    if (Input.GetKeyDown(KeyCode.Return))
-        {
-            SceneManager.LoadScene("MainScene");
-            //GameManager.restart();
-            //gameObject.SetActive(false);
-        }
 	}
+
+    public void onRetry()
+    {
+        SceneManager.LoadScene("MainScene");
+    }
+
+    public void onQuit()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }

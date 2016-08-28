@@ -12,8 +12,16 @@ public class MainGameController : MonoBehaviour
     public GameObject gameOver;
     public float minPlatformY = -1.3f;
     public float maxPlatformY = 2;
+    public float compoWidth = 40;
 
     public float lastObstaclePosition = 0;
+
+    private float elapsed = 0.0f;
+    Vector3 originalCamPos;
+    private float duration = 0.2f;
+    private float magnitude = 1f;
+    private bool isShaking = false;
+    private int lastPrefab = -1;
 
     public void Awake()
     {
@@ -37,22 +45,45 @@ public class MainGameController : MonoBehaviour
         {
             gameOver.SetActive(true);
         }
+        if (!isShaking && GameManager.shaking)
+        {
+            isShaking = true;
+            originalCamPos = Camera.main.transform.position;
+        }
+        if (!GameManager.shaking)
+        {
+            isShaking = true;
+        }
+        if (isShaking)
+        {
+            //Shake();
+        }
     }
 
     private void generateObstacle()
     {
-        if (player.position.x + 10 > lastObstaclePosition)
+        if (player.position.x + 10 + compoWidth/2 > lastObstaclePosition)
         {
-            int prefabType = Random.Range(0, obstaclePrefabs.Length);
-            GameObject obstacle = Instantiate(obstaclePrefabs[prefabType]);
-            obstacle.transform.position = new Vector3(player.position.x + 20, obstacle.transform.position.y, 0);
-            FallingController fallingCtrl = obstacle.GetComponent<FallingController>();
-            if (fallingCtrl != null)
+            int prefabType = lastPrefab;
+            while (prefabType == lastPrefab)
             {
-                fallingCtrl.player = player;
+                prefabType = Random.Range(0, obstaclePrefabs.Length);
             }
-            lastObstaclePosition = obstacle.transform.position.x;
-            generatePowerUps(obstacle.transform.position);
+            lastPrefab = prefabType;
+            GameObject obstacle = Instantiate(obstaclePrefabs[prefabType]);
+            obstacle.transform.position = new Vector3(player.position.x + 20 + compoWidth / 2, obstacle.transform.position.y, 0);
+            for (int i = 0; i < obstacle.transform.childCount; i++)
+            {
+                Transform child = obstacle.transform.GetChild(i);
+                FallingController fallingCtrl = child.gameObject.GetComponent<FallingController>();
+                if (fallingCtrl != null)
+                {
+                    fallingCtrl.player = player;
+                }
+            }
+           
+            lastObstaclePosition = obstacle.transform.position.x + compoWidth;
+            //generatePowerUps(obstacle.transform.position);
         }
             //if (obstacle.tag == "Platform")
             //{
@@ -80,5 +111,27 @@ public class MainGameController : MonoBehaviour
         
         GameObject oneup = Instantiate(oneupPrefab);
         oneup.transform.position = position;
+    }
+
+    void Shake()
+    {
+        while (elapsed < duration)
+        {
+
+            elapsed += Time.deltaTime;
+
+            float percentComplete = elapsed / duration;
+            float damper = 1.0f - Mathf.Clamp(4.0f * percentComplete - 3.0f, 0.0f, 1.0f);
+
+            // map value to [-1, 1]
+            float x = Random.value * 2.0f - 1.0f;
+            float y = Random.value * 2.0f - 1.0f;
+            x *= magnitude * damper;
+            y *= magnitude * damper;
+
+            Camera.main.transform.position = new Vector3(x, y, originalCamPos.z);
+        }
+
+        Camera.main.transform.position = originalCamPos;
     }
 }

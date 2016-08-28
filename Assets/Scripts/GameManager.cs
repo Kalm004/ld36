@@ -6,6 +6,7 @@
     public const float maxSpeed = 15;
 
     public static float currentSpeed;
+    public static bool shaking;
 
     public static void restart()
     {

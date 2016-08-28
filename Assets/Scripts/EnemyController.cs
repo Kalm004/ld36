@@ -5,6 +5,8 @@ public class EnemyController : MonoBehaviour
 {
     public float force;
     private Rigidbody2D rb2d;
+    private bool hitPlayer = false;
+    private Animator animator;
 
     // Use this for initialization
     void Start()
@@ -15,7 +17,7 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.lifes > 0)
+        if (GameManager.lifes > 0 || !hitPlayer)
         {
             transform.Translate(GameManager.currentSpeed * Time.deltaTime, 0, 0);
         }
@@ -36,9 +38,13 @@ public class EnemyController : MonoBehaviour
         {
             GameManager.score += 10;
         }
-        //if (collision.tag == "Platform")
-        //{
-        //    Destroy(collision.gameObject);
-        //}
+        if (collision.tag == "Player")
+        {
+            hitPlayer = true;
+        }
+        if (collision.tag == "Spikes")
+        {
+            Destroy(collision.gameObject);
+        }
     }
 }

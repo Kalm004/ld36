@@ -9,6 +9,7 @@ public class FallingController : MonoBehaviour
     private Renderer renderer;
     private Rigidbody2D rigidbody2d;
     private PlayerController playerController;
+    
     // Use this for initialization
     void Start()
     {
@@ -28,6 +29,7 @@ public class FallingController : MonoBehaviour
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
+        GameManager.shaking = true;
         //Destroy(gameObject);
         renderer.enabled = false;
         Destroy(GetComponent<BoxCollider2D>());

@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
     public float jumpForce;
     public int maxLifes;
-    public Text lifesText;
+    public Image[] lifesImages;
     public float stopTimeOnCollision;
     //public float runningSpeed;
     public float sprintingSpeed;
@@ -14,6 +15,9 @@ public class PlayerController : MonoBehaviour
     public float distanceOnSprinting = 4;
     public float liveDistance = 2;
     public float maxJumpingTime;
+    public float minEnemyDistance = 5;
+    public AudioSource lostLife;
+    public ParticleSystem slideEffect;
 
     private Rigidbody2D rb2d;
     private float startSprintingPosition = 0;
@@ -29,6 +33,13 @@ public class PlayerController : MonoBehaviour
         {
             if (stat != value)
             {
+                if (value == states.slide)
+                {
+                    slideEffect.Play();
+                } else
+                {
+                    slideEffect.Stop();
+                }
                 stat = value;
                 animator.SetInteger("status", (int)value);
             }
@@ -62,7 +73,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        lifesText.text = "Lifes: " + GameManager.lifes.ToString();
+        if (Input.GetKey(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
+        //lifesText.text = "Lifes: " + GameManager.lifes.ToString();
         if (GameManager.lifes > 0)
         {
             float speed = GameManager.currentSpeed;
@@ -107,7 +122,7 @@ public class PlayerController : MonoBehaviour
             }
             if (status == states.resting || status == states.hit)
             {
-                float targetPos = enemy.transform.position.x + liveDistance * GameManager.lifes;
+                float targetPos = enemy.transform.position.x + minEnemyDistance + liveDistance * GameManager.lifes;
                 if (transform.position.x <= targetPos)
                 {
                     transform.position = new Vector3(targetPos, transform.position.y, 0);
@@ -138,9 +153,21 @@ public class PlayerController : MonoBehaviour
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
+        bool damage = false;
         if (collision.collider.tag == "Obstacle")
         {
             GameManager.lifes--;
+            damage = true;
+            lostLife.Play();
+        }
+        if (collision.collider.tag == "Spikes")
+        {
+            GameManager.lifes = 0;
+            damage = true;
+            lostLife.Play();
+        }
+        if (damage) {
+            lifesImages[GameManager.lifes].enabled = false;
             //Destroy(collision.collider.gameObject);
             if (GameManager.lifes > 0)
             {
@@ -174,6 +201,7 @@ public class PlayerController : MonoBehaviour
             {
                 Destroy(collision.gameObject);
                 GameManager.lifes++;
+                lifesImages[GameManager.lifes].enabled = true;
             }
         }
     }
