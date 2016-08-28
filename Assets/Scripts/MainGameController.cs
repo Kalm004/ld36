@@ -62,7 +62,7 @@ public class MainGameController : MonoBehaviour
 
     private void generateObstacle()
     {
-        if (player.position.x + 10 + compoWidth/2 > lastObstaclePosition)
+        if (player.position.x + 0 + compoWidth/2 > lastObstaclePosition || lastObstaclePosition == 0)
         {
             int prefabType = lastPrefab;
             while (prefabType == lastPrefab)
@@ -71,7 +71,7 @@ public class MainGameController : MonoBehaviour
             }
             lastPrefab = prefabType;
             GameObject obstacle = Instantiate(obstaclePrefabs[prefabType]);
-            obstacle.transform.position = new Vector3(player.position.x + 20 + compoWidth / 2, obstacle.transform.position.y, 0);
+            obstacle.transform.position = new Vector3(player.position.x + 0 + compoWidth / 2, obstacle.transform.position.y, 0);
             for (int i = 0; i < obstacle.transform.childCount; i++)
             {
                 Transform child = obstacle.transform.GetChild(i);
@@ -82,7 +82,7 @@ public class MainGameController : MonoBehaviour
                 }
             }
            
-            lastObstaclePosition = obstacle.transform.position.x + compoWidth;
+            lastObstaclePosition = obstacle.transform.position.x + compoWidth / 2;
             //generatePowerUps(obstacle.transform.position);
         }
             //if (obstacle.tag == "Platform")

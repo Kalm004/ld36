@@ -18,6 +18,7 @@ public class PlayerController : MonoBehaviour
     public float minEnemyDistance = 5;
     public AudioSource lostLife;
     public ParticleSystem slideEffect;
+    public AudioSource jumpSound;
 
     private Rigidbody2D rb2d;
     private float startSprintingPosition = 0;
@@ -86,6 +87,7 @@ public class PlayerController : MonoBehaviour
             {
                 status = states.jumping;
                 animator.SetBool("isJumping", true);
+                jumpSound.Play();
             }
             if ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
                 && status == states.jumping)
@@ -167,7 +169,10 @@ public class PlayerController : MonoBehaviour
             lostLife.Play();
         }
         if (damage) {
-            lifesImages[GameManager.lifes].enabled = false;
+            for (int i = GameManager.lifes; i < GameManager.maxLifes; i++)
+            {
+                lifesImages[i].enabled = false;
+            }
             //Destroy(collision.collider.gameObject);
             if (GameManager.lifes > 0)
             {
@@ -201,7 +206,7 @@ public class PlayerController : MonoBehaviour
             {
                 Destroy(collision.gameObject);
                 GameManager.lifes++;
-                lifesImages[GameManager.lifes].enabled = true;
+                lifesImages[GameManager.lifes - 1].enabled = true;
             }
         }
     }
