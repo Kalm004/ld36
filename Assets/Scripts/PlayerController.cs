@@ -35,6 +35,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     private states stat;
+    private float deathTime;
 
     private enum states
     {
@@ -42,7 +43,11 @@ public class PlayerController : MonoBehaviour
         jumping = 1,
         resting = 2,
         sprinting = 3,
-        falling = 4
+        falling = 4,
+        hit = 5,
+        hitDeath = 6,
+        death = 7,
+        slide = 8
     }
 
     // Use this for initialization
@@ -62,7 +67,7 @@ public class PlayerController : MonoBehaviour
         {
             float speed = GameManager.currentSpeed;
             if ((Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W))
-                && status != states.jumping && status != states.falling && status != states.resting)
+                && (status == states.running || status == states.sprinting))
             {
                 status = states.jumping;
                 animator.SetBool("isJumping", true);
@@ -71,11 +76,20 @@ public class PlayerController : MonoBehaviour
                 && status == states.jumping)
             {
                 jumpingTime += Time.deltaTime;
-                if (jumpingTime <= maxJumpingTime) {
+                if (jumpingTime <= maxJumpingTime)
+                {
                     rb2d.AddForce(Vector2.up * jumpForce, ForceMode2D.Force);
                 }
             }
-            if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W)) {
+            if ((Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)) && status == states.running) {
+                status = states.slide;
+            }
+            if ((Input.GetKeyUp(KeyCode.DownArrow) || Input.GetKeyUp(KeyCode.S)) && status == states.slide)
+            {
+                status = states.running;
+            }
+            if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W))
+            {
                 jumpingTime = 0;
                 status = states.falling;
             }
@@ -91,7 +105,7 @@ public class PlayerController : MonoBehaviour
                     speed = sprintingSpeed;
                 }
             }
-            if (status == states.resting)
+            if (status == states.resting || status == states.hit)
             {
                 float targetPos = enemy.transform.position.x + liveDistance * GameManager.lifes;
                 if (transform.position.x <= targetPos)
@@ -105,12 +119,20 @@ public class PlayerController : MonoBehaviour
                 }
             }
             transform.Translate(speed * Time.deltaTime, 0, 0);
-        }
 
-        if ((Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) && status != states.sprinting && status != states.jumping && status != states.falling)
+            if ((Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D)) && status != states.sprinting && status != states.jumping && status != states.falling)
+            {
+                status = states.sprinting;
+                startSprintingPosition = transform.position.x;
+            }
+        } else
         {
-            status = states.sprinting;
-            startSprintingPosition = transform.position.x;
+            if (status == states.hitDeath)
+            {
+                if (Time.time > deathTime + 0.2f) {
+                    status = states.death;
+                }
+            }
         }
     }
 
@@ -120,7 +142,14 @@ public class PlayerController : MonoBehaviour
         {
             GameManager.lifes--;
             //Destroy(collision.collider.gameObject);
-            status = states.resting;
+            if (GameManager.lifes > 0)
+            {
+                status = states.hit;
+            } else
+            {
+                status = states.hitDeath;
+                deathTime = Time.time;
+            }
         }
         if (collision.collider.tag == "Floor")
         {
