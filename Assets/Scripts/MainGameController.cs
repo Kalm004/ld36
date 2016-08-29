@@ -62,6 +62,25 @@ public class MainGameController : MonoBehaviour
                 {
                     fallingCtrl.player = player;
                 }
+
+                DeleteAwayFromTarget awayTarget = child.gameObject.GetComponent<DeleteAwayFromTarget>();
+                if (awayTarget != null)
+                {
+                    awayTarget.target = player;
+                }
+
+                if (child.tag == "Platform")
+                {
+                    for (int j = 0; j < child.childCount; j++)
+                    {
+                        Transform subChild = child.GetChild(j);
+                        PlatformController platformCtrl = subChild.gameObject.GetComponent<PlatformController>();
+                        if (platformCtrl != null)
+                        {
+                            platformCtrl.player = player;
+                        }
+                    }
+                }
             }
            
             lastObstaclePosition = obstacle.transform.position.x;

@@ -4,6 +4,7 @@ using System.Collections;
 public class PlatformController : MonoBehaviour
 {
     public GameObject destroyable;
+    public Transform player;
 
     // Use this for initialization
     void Start()
@@ -23,6 +24,7 @@ public class PlatformController : MonoBehaviour
         {
             GameObject instance = Instantiate(destroyable);
             instance.transform.position = transform.position;
+            instance.GetComponent<DeleteAwayFromTarget>().target = player;
             Destroy(gameObject);
         }
     }

@@ -25,6 +25,10 @@ public class FallingController : MonoBehaviour
         {
             rigidbody2d.isKinematic = false;
         }
+        if (player.position.x - transform.position.x > 20)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void OnCollisionEnter2D(Collision2D collision)
