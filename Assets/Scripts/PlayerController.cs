@@ -207,6 +207,8 @@ public class PlayerController : MonoBehaviour
                 Destroy(collision.gameObject);
                 GameManager.lifes++;
                 lifesImages[GameManager.lifes - 1].enabled = true;
+                status = states.sprinting;
+                startSprintingPosition = transform.position.x;
             }
         }
     }

@@ -7,6 +7,7 @@ public class MainGameController : MonoBehaviour
     public GameObject coinPrefab;
     public GameObject oneupPrefab;
     public Transform player;
+    public Transform enemy;
     public float generateInterval;
     public Text scoreText;
     public GameObject gameOver;
@@ -14,13 +15,7 @@ public class MainGameController : MonoBehaviour
     public float maxPlatformY = 2;
     public float compoWidth = 40;
 
-    public float lastObstaclePosition = 0;
-
-    private float elapsed = 0.0f;
-    Vector3 originalCamPos;
-    private float duration = 0.2f;
-    private float magnitude = 1f;
-    private bool isShaking = false;
+    private float lastObstaclePosition = -25;
     private int lastPrefab = -1;
 
     public void Awake()
@@ -45,24 +40,11 @@ public class MainGameController : MonoBehaviour
         {
             gameOver.SetActive(true);
         }
-        if (!isShaking && GameManager.shaking)
-        {
-            isShaking = true;
-            originalCamPos = Camera.main.transform.position;
-        }
-        if (!GameManager.shaking)
-        {
-            isShaking = true;
-        }
-        if (isShaking)
-        {
-            //Shake();
-        }
     }
 
     private void generateObstacle()
     {
-        if (player.position.x + 0 + compoWidth/2 > lastObstaclePosition || lastObstaclePosition == 0)
+        if (enemy.position.x > lastObstaclePosition + compoWidth / 2 || lastObstaclePosition < 0)
         {
             int prefabType = lastPrefab;
             while (prefabType == lastPrefab)
@@ -71,7 +53,7 @@ public class MainGameController : MonoBehaviour
             }
             lastPrefab = prefabType;
             GameObject obstacle = Instantiate(obstaclePrefabs[prefabType]);
-            obstacle.transform.position = new Vector3(player.position.x + 0 + compoWidth / 2, obstacle.transform.position.y, 0);
+            obstacle.transform.position = new Vector3(lastObstaclePosition + compoWidth, obstacle.transform.position.y, 0);
             for (int i = 0; i < obstacle.transform.childCount; i++)
             {
                 Transform child = obstacle.transform.GetChild(i);
@@ -82,7 +64,7 @@ public class MainGameController : MonoBehaviour
                 }
             }
            
-            lastObstaclePosition = obstacle.transform.position.x + compoWidth / 2;
+            lastObstaclePosition = obstacle.transform.position.x;
             //generatePowerUps(obstacle.transform.position);
         }
             //if (obstacle.tag == "Platform")
@@ -104,34 +86,12 @@ public class MainGameController : MonoBehaviour
         //}
     }
 
-    private void generatePowerUps(Vector3 position)
-    {
-        GameObject coin = Instantiate(coinPrefab);
-        coin.transform.position = position;
+    //private void generatePowerUps(Vector3 position)
+    //{
+    //    GameObject coin = Instantiate(coinPrefab);
+    //    coin.transform.position = position;
         
-        GameObject oneup = Instantiate(oneupPrefab);
-        oneup.transform.position = position;
-    }
-
-    void Shake()
-    {
-        while (elapsed < duration)
-        {
-
-            elapsed += Time.deltaTime;
-
-            float percentComplete = elapsed / duration;
-            float damper = 1.0f - Mathf.Clamp(4.0f * percentComplete - 3.0f, 0.0f, 1.0f);
-
-            // map value to [-1, 1]
-            float x = Random.value * 2.0f - 1.0f;
-            float y = Random.value * 2.0f - 1.0f;
-            x *= magnitude * damper;
-            y *= magnitude * damper;
-
-            Camera.main.transform.position = new Vector3(x, y, originalCamPos.z);
-        }
-
-        Camera.main.transform.position = originalCamPos;
-    }
+    //    GameObject oneup = Instantiate(oneupPrefab);
+    //    oneup.transform.position = position;
+    //}
 }

@@ -6,10 +6,10 @@ public class CoinController : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	    if (Random.Range(0f, 1f) > coinTreshold)
-        {
-            Destroy(gameObject);
-        }
+	    //if (Random.Range(0f, 1f) > coinTreshold)
+     //   {
+     //       Destroy(gameObject);
+     //   }
 	}
 	
 	// Update is called once per frame
